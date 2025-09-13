@@ -1,0 +1,537 @@
+ 
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文天玩WenTianPlay - 财务流水系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary-green: #00897B;
+            --light-green: #26A69A;
+            --dark-green: #00695C;
+            --accent-green: #4DB6AC;
+            --deep-green: #004D40;
+            --text-light: #FFFFFF;
+            --text-light-accent: #E0F2F1;
+            --glass-bg: rgba(0, 105, 92, 0.25);
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--deep-green) 0%, var(--dark-green) 100%);
+            color: var(--text-light-accent);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 77, 64, 0.4);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            z-index: -1;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 3.2rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(77, 182, 172, 0.7);
+            background: linear-gradient(to right, var(--accent-green), #69F0AE);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            color: var(--accent-green);
+            font-size: 1.2rem;
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .announcement {
+            background: var(--glass-bg);
+            color: #FFD54F;
+            padding: 18px;
+            border-radius: 16px;
+            margin-bottom: 35px;
+            text-align: center;
+            font-size: 1.3rem;
+            border-left: 4px solid #FFD54F;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            z-index: 5;
+            font-weight: 600;
+        }
+        
+        .announcement::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(229, 115, 115, 0.1), transparent);
+            z-index: -1;
+        }
+        
+        .records-container {
+            background: var(--glass-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            border: 1px solid rgba(77, 182, 172, 0.3);
+        }
+        
+        .records-header {
+            background: linear-gradient(90deg, rgba(38, 166, 154, 0.8), rgba(0, 137, 123, 0.8));
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        
+        .records-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #69F0AE, transparent);
+        }
+        
+        .records-header h2 {
+            font-weight: 600;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .records-header i {
+            color: #69F0AE;
+            font-size: 1.6rem;
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .filter-btn {
+            background: rgba(0, 77, 64, 0.4);
+            color: var(--text-light);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(77, 182, 172, 0.3);
+        }
+        
+        .filter-btn:hover {
+            background: rgba(38, 166, 154, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(90deg, var(--accent-green), var(--light-green));
+            color: var(--deep-green);
+            font-weight: 600;
+        }
+        
+        .records-list {
+            padding: 0;
+        }
+        
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 22px 30px;
+            border-bottom: 1px solid rgba(77, 182, 172, 0.2);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            background: rgba(0, 77, 64, 0.15);
+        }
+        
+        .record-item:hover {
+            background: rgba(38, 166, 154, 0.2);
+            transform: translateX(10px);
+        }
+        
+        .record-item:last-child {
+            border-bottom: none;
+        }
+        
+        .record-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--accent-green);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .record-item:hover::before {
+            opacity: 1;
+        }
+        
+        .record-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .record-name {
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .record-name i {
+            font-size: 1.1rem;
+            color: var(--accent-green);
+        }
+        
+        .record-time {
+            color: var(--accent-green);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .record-amount {
+            font-weight: 700;
+            font-size: 1.6rem;
+            padding: 5px 15px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .income .record-amount {
+            color: #69F0AE;
+            text-shadow: 0 0 10px rgba(105, 240, 174, 0.4);
+        }
+        
+        .expense .record-amount {
+            color: #FF8A65;
+            text-shadow: 0 0 10px rgba(255, 138, 101, 0.4);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: var(--accent-green);
+            font-size: 1rem;
+            margin-top: 30px;
+            border-top: 1px solid rgba(77, 182, 172, 0.3);
+            opacity: 0.8;
+        }
+        
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(77, 182, 172, 0.15) 0%, rgba(38, 166, 154, 0.05) 70%);
+            filter: blur(40px);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .records-header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+                text-align: center;
+            }
+            
+            .records-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .filter-controls {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .record-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .record-amount {
+                align-self: flex-end;
+                margin-top: 5px;
+            }
+        }
+        
+        /* Animation for initial load */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-item {
+            animation: fadeIn 0.6s ease forwards;
+            opacity: 0;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 77, 64, 0.2);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-green);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #69F0AE;
+        }
+        
+        /* Pulse animation for attention */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating background elements -->
+    <div class="floating-elements">
+        <div class="floating-element" style="width: 300px; height: 300px; top: 10%; left: 5%;"></div>
+        <div class="floating-element" style="width: 250px; height: 250px; top: 60%; left: 80%;"></div>
+        <div class="floating-element" style="width: 400px; height: 400px; top: 30%; left: 50%;"></div>
+        <div class="floating-element" style="width: 200px; height: 200px; top: 80%; left: 20%;"></div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <div class="header-bg"></div>
+            <h1><i class="fas fa-chart-line"></i> 文天玩财务流水系统</h1>
+            <p class="subtitle">每一笔收支皆清晰记录，资金流向一目了然</p>
+        </header>
+        
+        <div class="announcement pulse">
+            <i class="fas fa-bullhorn"></i> 公告：文天玩域名成本588￥/年
+        </div>
+        
+        <div class="records-container">
+            <div class="records-header">
+                <h2><i class="fas fa-money-bill-wave"></i> 财务流水记录</h2>
+                <div class="filter-controls">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class="fas fa-list"></i> 全部
+                    </button>
+                    <button class="filter-btn" data-filter="income">
+                        <i class="fas fa-arrow-down"></i> 收入
+                    </button>
+                    <button class="filter-btn" data-filter="expense">
+                        <i class="fas fa-arrow-up"></i> 支出
+                    </button>
+                </div>
+            </div>
+            
+            <ul class="records-list" id="recordsList">
+                <!-- 记录将通过JavaScript动态加载 -->
+            </ul>
+        </div>
+        
+        <footer>
+            <p><i class="fas fa-code"></i> 文天玩WenTianPlay | 财务系统     </footer>
+    </div>
+    
+    <script>
+        // 当页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取RMB.json中的数据
+            fetch('RMB.json')
+                .then(response => response.json())
+                .then(data => {
+                    renderRecords(data);
+                    setupFilterControls(data);
+                })
+                .catch(error => {
+                    console.error('加载数据失败:', error);
+                    document.getElementById('recordsList').innerHTML = `
+                        <div style="text-align:center; padding:40px; color:#FF8A65;">
+                            <i class="fas fa-exclamation-triangle" style="font-size:3rem; margin-bottom:20px;"></i>
+                            <h3>数据加载失败</h3>
+                            <p>耐心等待分刻……</p>
+                        </div>
+                    `;
+                });
+            
+            // 格式化日期显示
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return `${date.getFullYear()}年${(date.getMonth()+1).toString().padStart(2, '0')}月${date.getDate().toString().padStart(2, '0')}日`;
+            }
+            
+            // 渲染记录列表
+            function renderRecords(records) {
+                const recordsList = document.getElementById('recordsList');
+                recordsList.innerHTML = '';
+                
+                // 按时间倒序排列
+                records.sort((a, b) => new Date(b.time) - new Date(a.time));
+                
+                records.forEach((record, index) => {
+                    const listItem = document.createElement('li');
+                    listItem.className = `record-item animate-item ${record.type}`;
+                    listItem.style.animationDelay = `${index * 0.1}s`;
+                    
+                    // 根据类型选择图标
+                    const icon = record.type === 'income' 
+                        ? 'fas fa-arrow-circle-down' 
+                        : 'fas fa-arrow-circle-up';
+                        
+                    const amountPrefix = record.type === 'income' ? '+' : '-';
+                    
+                    listItem.innerHTML = `
+                        <div class="record-info">
+                            <div class="record-name">
+                                <i class="${icon}"></i> ${record.name}
+                            </div>
+                            <div class="record-time">
+                                <i class="far fa-calendar-alt"></i> ${formatDate(record.time)}
+                            </div>
+                        </div>
+                        <div class="record-amount">
+                            ${amountPrefix}${record.amount.toFixed(2)}￥
+                        </div>
+                    `;
+                    
+                    recordsList.appendChild(listItem);
+                });
+                
+                // 添加动画效果
+                gsap.utils.toArray('.animate-item').forEach(item => {
+                    gsap.fromTo(item, 
+                        { y: 30, opacity: 0 },
+                        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
+                    );
+                });
+            }
+            
+            // 设置筛选控制
+            function setupFilterControls(records) {
+                const filterButtons = document.querySelectorAll('.filter-btn');
+                
+                filterButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        // 更新活动按钮状态
+                        filterButtons.forEach(btn => btn.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // 获取筛选类型
+                        const filterType = this.dataset.filter;
+                        
+                        // 筛选记录
+                        let filteredRecords = records;
+                        if (filterType !== 'all') {
+                            filteredRecords = records.filter(record => record.type === filterType);
+                        }
+                        
+                        // 重新渲染记录
+                        renderRecords(filteredRecords);
+                    });
+                });
+            }
+            
+            // 添加悬浮元素的动画
+            gsap.to('.floating-element', {
+                duration: 30,
+                x: 'random(-100, 100)',
+                y: 'random(-100, 100)',
+                repeat: -1,
+                repeatRefresh: true,
+                ease: "none"
+            });
+        });
+    </script>
+</body>
+</html>
+ 

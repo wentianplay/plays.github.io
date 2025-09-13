@@ -1,0 +1,22 @@
+ 
+[
+  {
+    "name": "域名续费",
+    "time": "2023-05-15",
+    "amount": 588,
+    "type": "expense"
+  },
+  {
+    "name": "广告收入",
+    "time": "2023-05-10",
+    "amount": 3200,
+    "type": "income"
+  },
+  {
+    "name": "服务器租赁",
+    "time": "2023-05-05",
+    "amount": 1200,
+    "type": "expense"
+  }
+]
+ 
